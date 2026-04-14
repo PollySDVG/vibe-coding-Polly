@@ -80,7 +80,7 @@ tr:hover td{background:#faf9f6}
 <div id="cont"></div>
 
 <script>
-var tasks = [
+var DEFAULT_TASKS = [
   // Работа с вендорами и партнёрами
   {id:'garm1', name:'Гармония — внутренние процессы и координация', section:'Гармония', date:'', note:'Шаг 1) Изучить пайп — ссылка уже есть (Яндекс.Диск от Оли). Разобраться со структурой. Шаг 2) Созвон с Олей (+Марина Белецкая, Юля, Даша?): как читать пайп, кто такие ПАМы (узнать персоналии и список партнёров), как фиксируются партнёры. Шаг 3) Прояснить у Юли и Даши: что они хотят видеть в пайплайн-ревью — метрики, периодичность, формат. Что нужно изменить от текущего процесса. Шаг 4) Составить процесс регистрации сделки: кто, как и когда вносит данные. Или тут всё ок? Шаг 5) Составить список партнёров с привязкой к сделкам. Совместно с Олей актуализировать.', link:'https://disk.yandex.ru/edit/d/_Han8gFEwNl3GPzfUZ0ZeiPegnqahzm72s0qoIz-cKg6WWtfdWQySDVEQQ', link2:'https://disk.yandex.ru/edit/d/_Han8gFEwNl3GPzfUZ0ZeiPegnqahzm72s0qoIz-cKg6bmp3UkxpcmFmdw', link2name:'Полезности'},
   {id:'q2v2', name:'Ново БИ — встреча с вендором', section:'Работа с вендорами и партнёрами', date:'', note:'1) Готовим совместный вебинар и оффер (передала Ксюше). 2) Составляем список 10 компаний, которые хотим закоммитить — с которыми хорошие отношения, чтобы забронировать их за нами.'},
@@ -92,10 +92,10 @@ var tasks = [
   {id:'q2v9', name:'Новые вендоры — обсуждение с Юлей', section:'Работа с вендорами и партнёрами', date:'2026-05-01', note:'1. PIX: уточнить у Пчелинцевой и Кагарлицкой в мае. 2. Fesb: уточнить у Пчелинцевой и Кагарлицкой в мае. 3. Entaxy: обсудить целесообразность встреч и работы с вендором.'},
   // Мероприятия
   {id:'ev3', name:'OUT ТэкТОрг', section:'Мероприятия', date:'2026-04-08', note:'Вендор: Гармония. Формат: офлайн, партнёр. Обелов выступает.'},
-  {id:'ev4', name:'OUT Прогнозирование спроса', section:'Мероприятия', date:'2026-04-16', note:'Вендор: IBP. Формат: внешний, делегаты. Кагарлицкая + Самуйлова + Атамонова.'},
+  {id:'ev4', name:'OUT Прогнозирование спроса', section:'Мероприятия', date:'2026-04-16', note:'Вендор: IBP. Формат: внешний, делегаты. Шария + Маслова + Атамонова.'},
   {id:'ev5', name:'OUT IBS', section:'Мероприятия', date:'2026-04-16', note:'Вендор: Гармония. Формат: офлайн, партнёр. Обелов выступает.'},
   {id:'q2m1', name:'Yandex Cloud — Лаборатория решений DataLens', section:'Мероприятия', date:'2026-04-21', note:'Вычистить список для приглашения. Приглашение клиентов у сейлов — дедлайн 13 апреля. Уточнить участие и составить экшн-план по дальнейшему сотрудничеству.', link:'https://docs.google.com/spreadsheets/d/1q4YT07c_GYPCNzQZ3AG5O9_AJE4ftbmJ/edit?usp=sharing&ouid=116806113659385318964&rtpof=true&sd=true'},
-  {id:'q2m3', name:'BPMsoft Days — мероприятие', section:'Мероприятия', date:'2026-04-28', note:'Приглашение клиентов.', link:'https://wiki.yandex.ru/marketing-bpm/oflajjn-meroprijatie/bpmsoft-days-26-vendorskoe/?utm_referrer=about%3Ablank'},
+  {id:'q2m3', name:'BPMsoft Days — мероприятие', section:'Выполнено', date:'2026-04-28', note:'Приглашение клиентов ✓. Отчет Сергею СКМ — по ссылке Wiki.', link:'https://wiki.yandex.ru/marketing-bpm/oflajjn-meroprijatie/bpmsoft-days-26-vendorskoe/?utm_referrer=about%3Ablank'},
   {id:'ev7', name:'OUT ЦИПР', section:'Мероприятия', date:'2026-05-18', note:'Формат: внешний, делегаты. Маслова + Шария + Самуйлова.'},
   {id:'ev13', name:'Elma Low Stress', section:'Мероприятия', date:'2026-05-06', note:'Согласовать участие сейлов с клиентами.', link:'https://elma365.com/ru/elma-show-2026/'},
   {id:'ev8', name:'1С Ивент', section:'Мероприятия', date:'2026-05-20', note:'Подготовка Юли с сейлами — составить список кого звать. Выходит мартовский закон о том, что большим отраслям у всех должен быть отечественный ERP.'},
@@ -116,12 +116,21 @@ var tasks = [
   // Внутренние проекты
   {id:'q2i1', name:'Хакатон по вайбкодингу — уточнение формата и сроков', section:'Внутренние проекты', date:'', note:'Уточнить формат, сроки и организацию хакатона по вайбкодингу.'},
   // Выполнено
-  {id:'done2', name:'Поздравления клиентов / благодарности', section:'Выполнено', date:'', note:'1. Яна БПМ Софт (Шария и Егорова) — сертификат Золотое Яблоко 10 000 + пакет с вином. 2. Борхарт Лена (Шария) — цветы и такси 8 000 + пакет с вином. 3. Алексей Терентьев Акрихин (Шария) — подарочный сертификат 15 000, пока решают куда. 4. Мартынов (Егорова). 5. Хрушков Кирилл IT-one (Кагарлицкая).'},
+  {id:'done2', name:'Поздравления клиентов / благодарности', section:'Выполнено', date:'', note:'1. Яна БПМ Софт (Шария и Егорова) — сертификат Золотое Яблоко 10 000 + пакет с вином. 2. Борхарт Лена (Шария) — цветы и такси 8 000 + пакет с вином. 3. Алексей Терентьев Акрихин (Шария) — подарочный сертификат 15 000 ✓ 4. Мартынов (Егорова). 5. Хрушков Кирилл IT-one (Кагарлицкая).'},
   {id:'q2v6', name:'КРОК — комитет по РНК', section:'Выполнено', date:'2026-04-06', note:'1. Поддержка по закрытию текущего проекта — апрель (всё по плану). 2. Договор поддержки и развития — проект закроем в апреле, хотим поддерживать и развивать. 3. ППО для нового блока — ждём ответ. 4. ММК — участие в пресейле, мы ок.'},
   {id:'q2v3', name:'Аренадата — Arena Day', section:'Выполнено', date:'2026-04-07', note:'Уточнить необходимость организации встреч, пригласили на Arena Day. Составить маркетинговый план на 2026 год. Подтвердить партнёрский сертификат.'}
 ];
 
 var order = ['Гармония','Работа с вендорами и партнёрами','Мероприятия','Клиентская работа','Обучение и развитие','Внутренние проекты','Выполнено'];
+
+function loadTasks(){
+  try{var s=localStorage.getItem('polly-q2-tasks');if(s)return JSON.parse(s);}catch(e){}
+  return DEFAULT_TASKS.map(function(t){return Object.assign({},t);});
+}
+function saveTasks(){
+  try{localStorage.setItem('polly-q2-tasks',JSON.stringify(tasks));}catch(e){}
+}
+var tasks=loadTasks();
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 
@@ -136,10 +145,10 @@ function addTask(){
   if(!name){alert('Введите название');return;}
   tasks.push({id:uid(),name:name,section:document.getElementById('fs').value.trim()||'Общее',date:document.getElementById('fdt').value,note:document.getElementById('fno').value.trim()});
   ['fn','fs','fdt','fno'].forEach(function(i){document.getElementById(i).value='';});
-  updateDL();render();
+  saveTasks();updateDL();render();
 }
 
-function deleteTask(id){if(confirm('Удалить?')){tasks=tasks.filter(function(t){return t.id!==id});render();}}
+function deleteTask(id){if(confirm('Удалить?')){tasks=tasks.filter(function(t){return t.id!==id});saveTasks();render();}}
 
 function updateDL(){
   var dl=document.getElementById('sdl');
