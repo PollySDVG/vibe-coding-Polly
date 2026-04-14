@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f5f4f0;padding:20px}
+h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.sub{color:#666;font-size:13px;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:#fff;border-radius:10px;padding:14px 16px;border:0.5px solid #e0ddd5}
+.stat-val{font-size:26px;font-weight:600;line-height:1;color:#3563c4}
+.stat-lbl{font-size:12px;color:#888;margin-top:4px}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.toolbar input{padding:6px 10px;border:0.5px solid #d0cdc5;border-radius:7px;background:#fff;font-size:13px;color:#1a1a1a;flex:1;min-width:160px}
+button{padding:6px 14px;border-radius:7px;border:0.5px solid #d0cdc5;background:#fff;font-size:13px;cursor:pointer;color:#1a1a1a}
+button:hover{background:#f0ede5}
+.btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.btn-primary:hover{background:#333}
+.btn-danger{color:#c03030;border-color:#e8c0c0;padding:4px 10px}
+.btn-danger:hover{background:#fdf0f0}
+.form-box{background:#fff;border-radius:12px;border:0.5px solid #e0ddd5;padding:18px;margin-bottom:16px}
+.fh{font-size:14px;font-weight:600;margin-bottom:14px}
+.fg{display:grid;gap:10px;margin-bottom:10px}
+.fg-2{grid-template-columns:1fr 1fr}
+.fg label{font-size:12px;color:#666;display:block;margin-bottom:3px}
+.fg input,.fg textarea{width:100%;padding:7px 10px;border:0.5px solid #d0cdc5;border-radius:7px;background:#fff;font-size:13px;color:#1a1a1a}
+.fg textarea{resize:vertical;min-height:38px}
+.form-actions{display:flex;gap:8px;margin-top:4px}
+.sec-block{background:#fff;border-radius:12px;border:0.5px solid #e0ddd5;margin-bottom:14px;overflow:hidden}
+.sec-head{padding:11px 16px;display:flex;align-items:center;gap:10px;background:#faf9f6;border-bottom:0.5px solid #e0ddd5}
+.sec-title{font-weight:600;font-size:14px;flex:1}
+.sec-count{font-size:12px;color:#888}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{font-size:12px;color:#888;font-weight:500;text-align:left;padding:8px 12px;border-bottom:0.5px solid #e8e5de}
+td{padding:9px 12px;border-bottom:0.5px solid #f0ede5;vertical-align:top;font-size:13px;word-break:break-word}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#faf9f6}
+.tname{font-weight:500}
+.date-cell{white-space:nowrap;color:#3563c4;font-weight:500;font-size:13px}
+.date-none{color:#bbb;font-size:12px}
+.empty{padding:28px;text-align:center;color:#aaa;font-size:13px}
+.note-row{display:flex;gap:4px;margin-bottom:2px;font-size:12px;color:#555}
+.note-num{flex-shrink:0;color:#aaa}
+</style>
+</head>
+<body>
+
+<h1>План: Q2 2026</h1>
+<p class="sub">Сформирован на основе итогов Q1</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-val" id="cnt-all">0</div><div class="stat-lbl">Всего задач</div></div>
+  <div class="stat"><div class="stat-val" id="cnt-dated">0</div><div class="stat-lbl">С датой</div></div>
+  <div class="stat"><div class="stat-val" id="cnt-nodated">0</div><div class="stat-lbl">Дата не определена</div></div>
+</div>
+
+<div class="toolbar">
+  <button class="btn-primary" id="tbtn" onclick="toggleForm()">+ Добавить задачу</button>
+  <input type="text" id="search" placeholder="Поиск..." oninput="render()">
+  <button onclick="exportHTML()">⬇ Экспорт HTML</button>
+</div>
+
+<div class="form-box" id="fbox" style="display:none">
+  <div class="fh">Новая задача</div>
+  <div class="fg fg-2">
+    <div><label>Название *</label><input id="fn" placeholder="Название задачи"></div>
+    <div><label>Раздел</label><input id="fs" placeholder="Клиентская работа…" list="sdl"><datalist id="sdl"></datalist></div>
+  </div>
+  <div class="fg fg-2">
+    <div><label>Дата</label><input id="fdt" type="date"></div>
+    <div><label>Комментарий</label><input id="fno" placeholder="Доп. информация…"></div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-primary" onclick="addTask()">Добавить</button>
+    <button onclick="toggleForm()">Отмена</button>
+  </div>
+</div>
+
+<div id="cont"></div>
+
+<script>
+var tasks = [
+  // Работа с вендорами и партнёрами
+  {id:'garm1', name:'Гармония — внутренние процессы и координация', section:'Гармония', date:'', note:'Шаг 1) Изучить пайп — ссылка уже есть (Яндекс.Диск от Оли). Разобраться со структурой. Шаг 2) Созвон с Олей (+Марина Белецкая, Юля, Даша?): как читать пайп, кто такие ПАМы (узнать персоналии и список партнёров), как фиксируются партнёры. Шаг 3) Прояснить у Юли и Даши: что они хотят видеть в пайплайн-ревью — метрики, периодичность, формат. Что нужно изменить от текущего процесса. Шаг 4) Составить процесс регистрации сделки: кто, как и когда вносит данные. Или тут всё ок? Шаг 5) Составить список партнёров с привязкой к сделкам. Совместно с Олей актуализировать.', link:'https://disk.yandex.ru/edit/d/_Han8gFEwNl3GPzfUZ0ZeiPegnqahzm72s0qoIz-cKg6WWtfdWQySDVEQQ', link2:'https://disk.yandex.ru/edit/d/_Han8gFEwNl3GPzfUZ0ZeiPegnqahzm72s0qoIz-cKg6bmp3UkxpcmFmdw', link2name:'Полезности'},
+  {id:'q2v2', name:'Ново БИ — встреча с вендором', section:'Работа с вендорами и партнёрами', date:'', note:'1) Готовим совместный вебинар и оффер (передала Ксюше). 2) Составляем список 10 компаний, которые хотим закоммитить — с которыми хорошие отношения, чтобы забронировать их за нами.'},
+  {id:'q2v5', name:'Вендор BPMsoft — встреча', section:'Работа с вендорами и партнёрами', date:'2026-04-09', note:'Организация спиддейтинга для сейлов 4/15: ужин, презентация, развлекательная программа.'},
+  {id:'q2v4', name:'Вендор Весна — встречи', section:'Работа с вендорами и партнёрами', date:'2026-04-15', note:'Техническое демо + ИИ интеграция — 15.04. Организовать 3 встречи: техническая, пайп и маркетинг — даты определяются. Согласовать участие делегатов в "Новых горизонтах".'},
+  {id:'q2v1', name:'Форсайт — встреча', section:'Работа с вендорами и партнёрами', date:'2026-04-28', note:'Обсудить заработки с Евгением Ишниязовым. Сформировать план по работе с клиентами (Марина Белецкая). Сделать общий дозвон с Ишниязовым — Поля. Список клиентов для предложения Форсайт: 1) Бургер Кинг — Марина. 2) Вкусвилл — Марина. 3) Биннофарм — Аля. 4) Герофарм — Анна. 5) Территория — Анна. 6) НСПК — Аля. 7) Б1 — Аля. 8) Русагро — Юля. 9) Фармстандарт — Юля.'},
+  {id:'q2vad', name:'Аренадата — маркетинговый план 2026', section:'Работа с вендорами и партнёрами', date:'', note:'Сдать план по маркетингу на 2026 год.'},
+  {id:'q2v8', name:'Оптимакрос, Elma — обсуждение дальнейших действий', section:'Работа с вендорами и партнёрами', date:'', note:'1. Оптимакрос: готовим демонстрацию надстройки, жду информацию от Даши Кагарлицкой. 2. Elma: планируем согласовать личное участие Али или Марины 6 мая в Elma Low Stress. 3. Обсудить с Юлей/Мариной, какие действия необходимо предпринять по каждому из вендоров.'},
+  {id:'q2v9', name:'Новые вендоры — обсуждение с Юлей', section:'Работа с вендорами и партнёрами', date:'2026-05-01', note:'1. PIX: уточнить у Пчелинцевой и Кагарлицкой в мае. 2. Fesb: уточнить у Пчелинцевой и Кагарлицкой в мае. 3. Entaxy: обсудить целесообразность встреч и работы с вендором.'},
+  // Мероприятия
+  {id:'ev3', name:'OUT ТэкТОрг', section:'Мероприятия', date:'2026-04-08', note:'Вендор: Гармония. Формат: офлайн, партнёр. Обелов выступает.'},
+  {id:'ev4', name:'OUT Прогнозирование спроса', section:'Мероприятия', date:'2026-04-16', note:'Вендор: IBP. Формат: внешний, делегаты. Кагарлицкая + Самуйлова + Атамонова.'},
+  {id:'ev5', name:'OUT IBS', section:'Мероприятия', date:'2026-04-16', note:'Вендор: Гармония. Формат: офлайн, партнёр. Обелов выступает.'},
+  {id:'q2m1', name:'Yandex Cloud — Лаборатория решений DataLens', section:'Мероприятия', date:'2026-04-21', note:'Вычистить список для приглашения. Приглашение клиентов у сейлов — дедлайн 13 апреля. Уточнить участие и составить экшн-план по дальнейшему сотрудничеству.', link:'https://docs.google.com/spreadsheets/d/1q4YT07c_GYPCNzQZ3AG5O9_AJE4ftbmJ/edit?usp=sharing&ouid=116806113659385318964&rtpof=true&sd=true'},
+  {id:'q2m3', name:'BPMsoft Days — мероприятие', section:'Мероприятия', date:'2026-04-28', note:'Приглашение клиентов.', link:'https://wiki.yandex.ru/marketing-bpm/oflajjn-meroprijatie/bpmsoft-days-26-vendorskoe/?utm_referrer=about%3Ablank'},
+  {id:'ev7', name:'OUT ЦИПР', section:'Мероприятия', date:'2026-05-18', note:'Формат: внешний, делегаты. Маслова + Шария + Самуйлова.'},
+  {id:'ev13', name:'Elma Low Stress', section:'Мероприятия', date:'2026-05-06', note:'Согласовать участие сейлов с клиентами.', link:'https://elma365.com/ru/elma-show-2026/'},
+  {id:'ev8', name:'1С Ивент', section:'Мероприятия', date:'2026-05-20', note:'Подготовка Юли с сейлами — составить список кого звать. Выходит мартовский закон о том, что большим отраслям у всех должен быть отечественный ERP.'},
+  {id:'ev9', name:'IBP Day', section:'Мероприятия', date:'2026-05-21', note:'Вендор: IBP. Формат: офлайн, наше. Заказчик: Кагарлицкая Д. Статус: в работе.'},
+  {id:'ev11', name:'OUT Optimacros HUB', section:'Мероприятия', date:'2026-06-04', note:'Вендор: IBP. Формат: вендор, делегаты. Заказчик: Кагарлицкая Д. Кагарлицкая + Шария + Маслова.'},
+  {id:'ev12', name:'1С Ивент УХ', section:'Мероприятия', date:'2026-06-18', note:'Вендор: 1С. Формат: офлайн, наше. Заказчик: Смирнов Е.'},
+  {id:'ev10', name:'КК с Arenadata', section:'Мероприятия', date:'', note:'Формат: офлайн, наше.'},
+  // Клиентская работа
+  {id:'q2c6', name:'Клиентская встреча с Ликардом', section:'Клиентская работа', date:'', note:''},
+  {id:'q2c5', name:'Работа сейлов со списком лидгена', section:'Клиентская работа', date:'', note:'Выстроить для сейлов работу со списком лидгена: задачи, слоты для отработки, сбор обратной связи.'},
+  {id:'q2c2', name:'Клиентские встречи Марс и Роял Канин', section:'Клиентская работа', date:'', note:'Провести встречи — даты в согласовании. Маркетинг готовит приглашения.'},
+  {id:'q2c1', name:'Golden people — обновление списка дней рождения', section:'Клиентская работа', date:'', note:'Сверка со списком важных клиентов. Обновление дней рождения.'},
+  {id:'q2c3', name:'Еженедельные продуктовые офферы для клиентов', section:'Клиентская работа', date:'', note:'Сквозная задача на весь год — продолжать рассылку.'},
+
+  // Обучение и развитие
+  {id:'q2o1', name:'Завершение обучения ораторскому мастерству — Д. Кагарлицкая', section:'Обучение и развитие', date:'2026-04-14', note:'Окончание обучения. Перенесено по инициативе Дарьи.'},
+  {id:'q2m2', name:'Обучение сейлов — построение плана', section:'Обучение и развитие', date:'', note:'Поднять тему обучения сейлов: сделать опрос, согласовать с Юлей и Катей.'},
+  // Внутренние проекты
+  {id:'q2i1', name:'Хакатон по вайбкодингу — уточнение формата и сроков', section:'Внутренние проекты', date:'', note:'Уточнить формат, сроки и организацию хакатона по вайбкодингу.'},
+  // Выполнено
+  {id:'done2', name:'Поздравления клиентов / благодарности', section:'Выполнено', date:'', note:'1. Яна БПМ Софт (Шария и Егорова) — сертификат Золотое Яблоко 10 000 + пакет с вином. 2. Борхарт Лена (Шария) — цветы и такси 8 000 + пакет с вином. 3. Алексей Терентьев Акрихин (Шария) — подарочный сертификат 15 000, пока решают куда. 4. Мартынов (Егорова). 5. Хрушков Кирилл IT-one (Кагарлицкая).'},
+  {id:'q2v6', name:'КРОК — комитет по РНК', section:'Выполнено', date:'2026-04-06', note:'1. Поддержка по закрытию текущего проекта — апрель (всё по плану). 2. Договор поддержки и развития — проект закроем в апреле, хотим поддерживать и развивать. 3. ППО для нового блока — ждём ответ. 4. ММК — участие в пресейле, мы ок.'},
+  {id:'q2v3', name:'Аренадата — Arena Day', section:'Выполнено', date:'2026-04-07', note:'Уточнить необходимость организации встреч, пригласили на Arena Day. Составить маркетинговый план на 2026 год. Подтвердить партнёрский сертификат.'}
+];
+
+var order = ['Гармония','Работа с вендорами и партнёрами','Мероприятия','Клиентская работа','Обучение и развитие','Внутренние проекты','Выполнено'];
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+function toggleForm(){
+  var f=document.getElementById('fbox'),b=document.getElementById('tbtn');
+  if(f.style.display==='none'||!f.style.display){f.style.display='block';b.textContent='✕ Закрыть';document.getElementById('fn').focus();}
+  else{f.style.display='none';b.textContent='+ Добавить задачу';}
+}
+
+function addTask(){
+  var name=document.getElementById('fn').value.trim();
+  if(!name){alert('Введите название');return;}
+  tasks.push({id:uid(),name:name,section:document.getElementById('fs').value.trim()||'Общее',date:document.getElementById('fdt').value,note:document.getElementById('fno').value.trim()});
+  ['fn','fs','fdt','fno'].forEach(function(i){document.getElementById(i).value='';});
+  updateDL();render();
+}
+
+function deleteTask(id){if(confirm('Удалить?')){tasks=tasks.filter(function(t){return t.id!==id});render();}}
+
+function updateDL(){
+  var dl=document.getElementById('sdl');
+  dl.innerHTML=[...new Set(tasks.map(function(t){return t.section}))].map(function(s){return'<option value="'+esc(s)+'">'}).join('');
+}
+
+function fmtDate(d){
+  if(!d)return null;
+  var p=d.split('-');
+  var mn=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  return parseInt(p[2])+' '+mn[parseInt(p[1])-1];
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function formatNote(text){
+  if(!text||text==='—')return'—';
+  var parts=text.split(/(?=\d+[\.\)])/);
+  if(parts.length<=1)return'<span>'+esc(text).replace(/\. /g,'.<br>')+'</span>';
+  return parts.map(function(p){
+    p=p.trim();if(!p)return'';
+    var m=p.match(/^(\d+[\.)])\s*(.*)/s);
+    if(m)return'<div style="display:flex;gap:4px;margin-bottom:2px"><span style="flex-shrink:0;color:#aaa;font-size:12px">'+m[1]+'</span><span style="font-size:12px;color:#555">'+esc(m[2])+'</span></div>';
+    return'<div style="font-size:12px;color:#555">'+esc(p)+'</div>';
+  }).join('');
+}
+
+function render(){
+  var q=(document.getElementById('search').value||'').toLowerCase();
+  var fil=tasks.filter(function(t){return!q||t.name.toLowerCase().includes(q)||t.section.toLowerCase().includes(q)||(t.note||'').toLowerCase().includes(q);});
+  document.getElementById('cnt-all').textContent=tasks.length;
+  document.getElementById('cnt-dated').textContent=tasks.filter(function(t){return!!t.date}).length;
+  document.getElementById('cnt-nodated').textContent=tasks.filter(function(t){return!t.date}).length;
+  var c=document.getElementById('cont');
+  if(!fil.length){c.innerHTML='<div class="empty">Нет задач</div>';return;}
+  var allSecs=[...new Set(fil.map(function(t){return t.section}))];
+  var secs=order.filter(function(s){return allSecs.includes(s)}).concat(allSecs.filter(function(s){return!order.includes(s)}).sort());
+  c.innerHTML=secs.map(function(sec){
+    var items=fil.filter(function(t){return t.section===sec}).slice().sort(function(a,b){
+      if(!a.date&&!b.date)return 0;if(!a.date)return 1;if(!b.date)return-1;
+      return a.date.localeCompare(b.date);
+    });
+    return '<div class="sec-block">'+
+      '<div class="sec-head"><span class="sec-title">'+esc(sec)+'</span><span class="sec-count">'+items.length+' зад.</span></div>'+
+      '<table><colgroup><col style="width:12%"><col style="width:35%"><col style="width:44%"><col style="width:9%"></colgroup>'+
+      '<thead><tr><th>Дата</th><th>Задача</th><th>Комментарий</th><th></th></tr></thead>'+
+      '<tbody>'+items.map(function(t){
+        var dt=fmtDate(t.date);
+        return '<tr>'+
+          '<td>'+(dt?'<span class="date-cell">'+dt+'</span>':'<span class="date-none">—</span>')+'</td>'+
+          '<td><div class="tname">'+esc(t.name)+'</div></td>'+
+          '<td>'+formatNote(t.note||'—')+(t.link?'<div style="margin-top:4px"><a href="'+t.link+'" style="color:#3563c4;font-size:12px;word-break:break-all">'+t.link+'</a></div>':'')+(t.link2?'<div style="margin-top:2px"><a href="'+t.link2+'" style="color:#3563c4;font-size:12px">'+(t.link2name||t.link2)+'</a></div>':'')+'</td>'+
+          '<td style="text-align:right"><button class="btn-danger" onclick="deleteTask(\''+t.id+'\')">✕</button></td></tr>';
+      }).join('')+'</tbody></table></div>';
+  }).join('');
+}
+
+function exportHTML(){
+  var rows=tasks.filter(function(t){return t.section!=='Выполнено'}).slice().sort(function(a,b){if(!a.date&&!b.date)return 0;if(!a.date)return 1;if(!b.date)return-1;return a.date.localeCompare(b.date);}).map(function(t){
+    var dt=fmtDate(t.date);
+    return'<tr><td>'+(dt||'—')+'</td><td>'+esc(t.section)+'</td><td><b>'+esc(t.name)+'</b></td><td style="font-size:12px;color:#888">'+esc(t.note||'')+'</td></tr>';
+  }).join('');
+  var html='<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>План Q2 2026</title><style>body{font-family:Arial,sans-serif;font-size:13px;padding:32px;color:#1a1a1a}h1{font-size:22px}p{color:#666;margin:4px 0 20px}table{width:100%;border-collapse:collapse}th{background:#f5f4f0;padding:8px 10px;text-align:left;font-size:12px;color:#555;border:1px solid #e0ddd5}td{padding:8px 10px;border:1px solid #e8e5de;vertical-align:top}</style></head><body><h1>План: Q2 2026</h1><p>Сформировано: '+new Date().toLocaleDateString('ru')+'</p><table><thead><tr><th>Дата</th><th>Раздел</th><th>Задача</th><th>Комментарий</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>';
+  var a=document.createElement('a');a.href='data:text/html;charset=utf-8,'+encodeURIComponent(html);a.download='plan-q2-2026.html';a.click();
+}
+
+render();
+</script>
+</body>
+</html>
